@@ -1,3 +1,5 @@
+import 'package:expenso_mobile_app/pages/home_page.dart';
+import 'package:expenso_mobile_app/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -12,18 +14,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Expenso Mobile App',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+      //home: HomePage(),
+      themeMode: ThemeMode.light,
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Expenso app home page"),
-        ),
-        body: const Center(
-          child: Text("Expenso body content"),
-        ),
-      )
+      routes: {
+        "/" :(context) => HomePage(),
+        "/home" :(context) => HomePage(),
+        "/login" :(context) => LoginPage()
+      },
     );
   }
 }
