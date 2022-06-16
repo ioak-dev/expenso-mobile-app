@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.ioak.expenso_mobile_app">
+    package="io.ioak.endurance">
    <application
-        android:label="expenso_mobile_app"
+        android:label="endurance"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

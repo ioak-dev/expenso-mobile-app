@@ -1,4 +1,4 @@
-package io.ioak.expenso_mobile_app
+package io.ioak.endurance
 
 import io.flutter.embedding.android.FlutterActivity
 
