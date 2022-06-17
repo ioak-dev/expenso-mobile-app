@@ -15,6 +15,12 @@ class EnduranceApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        brightness: Brightness.dark,
+        primaryColor: Colors.blue
+      ),
+      themeMode: ThemeMode.system,
       home: const HomePage(title: 'Home Page'),
     );
   }
