@@ -1,4 +1,4 @@
-import 'package:endurance/data/activity.dart';
+import 'package:endurance/shared/preset.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -20,7 +20,7 @@ class DatabaseHelper {
       onCreate: (database, version) async {
         await database.execute(
           """
-            CREATE TABLE activity (
+            CREATE TABLE preset (
               id INTEGER PRIMARY KEY AUTOINCREMENT, 
               name TEXT NOT NULL,
               seconds INTEGER NOT NULL, 

@@ -1,10 +1,10 @@
-class Activity {
+class Preset {
   final int id;
   final String name;
   final int seconds;
   final int order;
 
-  const Activity({
+  const Preset({
     required this.id,
     required this.name,
     required this.seconds,
@@ -26,6 +26,6 @@ class Activity {
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Dog{id: $id, name: $name, seconds: $seconds, order: $order}';
+    return 'Preset{id: $id, name: $name, seconds: $seconds, order: $order}';
   }
 }
