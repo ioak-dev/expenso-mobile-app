@@ -1,4 +1,6 @@
-import 'package:endurance/screens/home.dart';
+import 'package:endurance/preset/preset_create/preset_create_page.dart';
+import 'package:endurance/dashboard/dashboard_page.dart';
+import 'package:endurance/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +17,17 @@ class EnduranceApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: const HomePage(title: 'Home Page'),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        brightness: Brightness.dark,
+        primaryColor: Colors.blueGrey,
+      ),
+      themeMode: ThemeMode.system,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomePage(title: 'Home Page'),
+        '/preset/create': (context) => const CreatePresetPage()
+      },
     );
   }
 }
