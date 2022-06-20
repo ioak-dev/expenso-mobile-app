@@ -1,4 +1,4 @@
-import 'package:endurance/shared/preset.dart';
+import 'package:endurance/database/model/preset.dart';
 import 'package:flutter/material.dart';
 
 class PresetListItem extends StatelessWidget {
@@ -29,7 +29,7 @@ class PresetListItem extends StatelessWidget {
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      Text("${preset.seconds}s",
+                      Text("${10}s",
                           textAlign: TextAlign.start)
                     ])),
             Align(

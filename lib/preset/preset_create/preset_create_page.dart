@@ -1,3 +1,5 @@
+import 'package:endurance/database/database_provider.dart';
+import 'package:endurance/database/model/preset.dart';
 import 'package:flutter/material.dart';
 
 class CreatePresetPage extends StatefulWidget {
@@ -20,6 +22,12 @@ class _CreatePresetPageState extends State<CreatePresetPage> {
     Navigator.pop(context);
   }
 
+  void savePreset() async {
+    await DatabaseProvider.instance.create(Preset(name: 'test'));
+    print(await DatabaseProvider.instance.readAllPreset());
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +41,7 @@ class _CreatePresetPageState extends State<CreatePresetPage> {
                 padding: EdgeInsets.only(right: 20.0),
                 child: GestureDetector(
                   onTap: () {
-                    closePage();
+                    savePreset();
                   },
                   child: Icon(Icons.check),
                 ))

@@ -32,9 +32,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: Text(widget.title),
-        // ),
         body: IndexedStack(index: _currentIndex, children: screens),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
