@@ -5,4 +5,4 @@ abstract class PresetEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchPresetEvent extends PresetEvent {}
+class FetchPresets extends PresetEvent {}

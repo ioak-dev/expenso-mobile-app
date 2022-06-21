@@ -40,49 +40,6 @@ class DatabaseProvider {
     ''');
   }
 
-  Future<Preset> create(Preset preset) async {
-    final db = await instance.database;
-    if (preset.id == null) {
-      preset.createdAt = DateTime.now();
-    }
-    preset.modifiedAt = DateTime.now();
-    final id = await db.insert(tablePreset, preset.toMap());
-    return preset.copy(id: id);
-  }
-
-  Future<Preset> readPreset(int id) async {
-    final db = await instance.database;
-    final response = await db.query(tablePreset,
-        columns: PresetFields.values,
-        where: '${PresetFields.id} = ?',
-        whereArgs: [id]);
-    if (response.isNotEmpty) {
-      return Preset.fromMap(response.first);
-    }
-    throw Exception('ID ${id} not found');
-  }
-
-  Future<List<Preset>> readAllPreset() async {
-    print('*****');
-    final db = await instance.database;
-    const orderBy = '${PresetFields.name} ASC';
-    final response = await db.query(tablePreset, orderBy: orderBy);
-    return response.map((map) => Preset.fromMap(map)).toList();
-  }
-
-  Future<int> update(Preset preset) async {
-    final db = await instance.database;
-    preset.modifiedAt = DateTime.now();
-    return db.update(tablePreset, preset.toMap(),
-        where: '${PresetFields.id} = ?', whereArgs: [preset.id]);
-  }
-
-  Future<int> delete(int id) async {
-    final db = await instance.database;
-    return db
-        .delete(tablePreset, where: '${PresetFields.id} = ?', whereArgs: [id]);
-  }
-
   Future close() async {
     final db = await instance.database;
     db.close();

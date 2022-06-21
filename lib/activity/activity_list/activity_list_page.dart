@@ -1,17 +1,17 @@
-import 'package:endurance/preset/preset_list/preset_list.dart';
-import 'package:endurance/database/model/preset.dart';
-import 'package:endurance/preset/preset_list/preset_new.dart';
+import 'package:endurance/activity/activity_list/activity_list.dart';
+import 'package:endurance/database/model/activity.dart';
+import 'package:endurance/activity/activity_list/activity_new.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class PresetListPage extends StatefulWidget {
-  const PresetListPage({Key? key}) : super(key: key);
+class ActivityListPage extends StatefulWidget {
+  const ActivityListPage({Key? key}) : super(key: key);
 
   @override
-  State<PresetListPage> createState() => _PresetListPageState();
+  State<ActivityListPage> createState() => _ActivityListPageState();
 }
 
-class _PresetListPageState extends State<PresetListPage> {
+class _ActivityListPageState extends State<ActivityListPage> {
   int _counter = 0;
 
   void _incrementCounter() {
@@ -34,14 +34,14 @@ class _PresetListPageState extends State<PresetListPage> {
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
   void openAddPage() {
-    Navigator.pushNamed(context, '/preset/create');
+    Navigator.pushNamed(context, '/activity/create');
     // return showModalBottomSheet(
     //     shape: const RoundedRectangleBorder(
     //         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0))),
     //     isScrollControlled: true,
     //     context: context,
     //     builder: (context) {
-    //       return Wrap(children: const [PresetNew()]);
+    //       return Wrap(children: const [ActivityNew()]);
     //     });
   }
 
@@ -49,7 +49,7 @@ class _PresetListPageState extends State<PresetListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Preset list"),
+        title: const Text("Activity list"),
         elevation: 0,
         actions: [
           Padding(
@@ -65,7 +65,7 @@ class _PresetListPageState extends State<PresetListPage> {
       body: Container(
           child: Column(
         children: [
-          PresetList(),
+          ActivityList(),
         ],
       )),
       // floatingActionButton: FloatingActionButton(

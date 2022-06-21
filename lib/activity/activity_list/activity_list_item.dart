@@ -1,14 +1,14 @@
-import 'package:endurance/database/model/preset.dart';
+import 'package:endurance/database/model/activity.dart';
 import 'package:flutter/material.dart';
 
-class PresetListItem extends StatelessWidget {
-  PresetListItem({Key? key, required this.preset}) : super(key: key);
+class ActivityListItem extends StatelessWidget {
+  ActivityListItem({Key? key, required this.activity}) : super(key: key);
 
-  Preset preset;
+  Activity activity;
 
   handleClick(context) {
-    print(preset);
-    Navigator.pushNamed(context, '/preset/view', arguments: {'id': preset.id});
+    print(activity);
+    Navigator.pushNamed(context, '/activity/view', arguments: {'id': activity.id});
   }
 
   @override
@@ -26,7 +26,7 @@ class PresetListItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        preset.name,
+                        activity.name,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                       ),
