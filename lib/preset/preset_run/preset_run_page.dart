@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:endurance/bloc/activity_bloc.dart';
+import 'package:endurance/bloc/preset_bloc.dart';
 import 'package:endurance/database/database_provider.dart';
 import 'package:endurance/database/model/activity.dart';
 import 'package:endurance/database/activity_repository.dart';
+import 'package:endurance/database/model/preset.dart';
 import 'package:endurance/shared/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -146,7 +148,9 @@ class _PresetRunPageState extends State<PresetRunPage> {
 
   void stop() {}
 
-  Widget renderBody() {
+  Widget renderBody(PresetState state) {
+    Preset preset =
+        state.presets.firstWhere((element) => element.id == widget.presetId);
     return AnimatedContainer(
       color:
           activity == null ? Colors.transparent : Color(activity?.color ?? 0),
@@ -163,7 +167,7 @@ class _PresetRunPageState extends State<PresetRunPage> {
                     color: getFontColorForBackground(
                         Color(activity?.color ?? 000)))),
             Text(
-              activity?.name ?? '',
+              preset.name,
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
@@ -177,6 +181,17 @@ class _PresetRunPageState extends State<PresetRunPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(
+                  activity?.name ?? '',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: getFontColorForBackground(
+                          Color(activity?.color ?? 0))),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(
                   "${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
                   textAlign: TextAlign.center,
@@ -270,7 +285,9 @@ class _PresetRunPageState extends State<PresetRunPage> {
       //   title: Text(activity?.name ?? ''),
       //   centerTitle: true,
       // ),
-      body: renderBody(),
+      body: BlocBuilder<PresetBloc, PresetState>(builder: (context, state) {
+        return renderBody(state);
+      }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: renderFloatingAction(),
     );
