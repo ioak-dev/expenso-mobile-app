@@ -130,6 +130,8 @@ class _PresetRunPageState extends State<PresetRunPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Color(activity?.color ?? 000),
+        foregroundColor:
+            getFontColorForBackground(Color(activity?.color ?? 000)),
         title: Text(activity?.name ?? ''),
         centerTitle: true,
       ),

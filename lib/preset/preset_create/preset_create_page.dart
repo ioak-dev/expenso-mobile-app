@@ -41,26 +41,27 @@ class _CreatePresetPageState extends State<CreatePresetPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            title: Text('New preset'),
-            centerTitle: true,
-            actions: [
-              Padding(
-                  padding: EdgeInsets.only(right: 20.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      savePreset();
-                    },
-                    child: Icon(Icons.check),
-                  ))
-            ],
-            leading: GestureDetector(
-              onTap: () {
-                closePage();
-              },
-              child: Icon(Icons.close),
-            )),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Text('New preset'),
+          centerTitle: true,
+          actions: [
+            Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {
+                    savePreset();
+                  },
+                  child: Icon(Icons.check),
+                ))
+          ],
+          // leading: GestureDetector(
+          //   onTap: () {
+          //     closePage();
+          //   },
+          //   child: Icon(Icons.close),
+          // )
+        ),
         body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(children: [

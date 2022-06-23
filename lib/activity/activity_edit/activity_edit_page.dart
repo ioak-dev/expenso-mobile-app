@@ -4,6 +4,7 @@ import 'package:endurance/bloc/activity_bloc.dart';
 import 'package:endurance/database/database_provider.dart';
 import 'package:endurance/database/model/activity.dart';
 import 'package:endurance/database/activity_repository.dart';
+import 'package:endurance/shared/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -102,7 +103,8 @@ class _ActivityEditPageState extends State<ActivityEditPage> {
         child: Container(
           width: double.infinity,
           height: 60,
-          child: Icon(Icons.format_color_fill),
+          child: Icon(Icons.format_color_fill,
+              color: getFontColorForBackground(Color(activity?.color ?? 0))),
           decoration: BoxDecoration(
               color: currentColor,
               borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -209,13 +211,7 @@ class _ActivityEditPageState extends State<ActivityEditPage> {
                     },
                     child: Icon(Icons.check),
                   ))
-            ],
-            leading: GestureDetector(
-              onTap: () {
-                closePage();
-              },
-              child: Icon(Icons.close),
-            )),
+            ]),
         body: renderBody());
   }
 }
