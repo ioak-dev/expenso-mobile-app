@@ -30,6 +30,7 @@ class _PresetRunPageState extends State<PresetRunPage> {
   Activity? activity;
   Timer? timer;
   Duration duration = const Duration(seconds: 0);
+  int currentIndex = 0;
 
   @override
   void initState() {
@@ -58,14 +59,13 @@ class _PresetRunPageState extends State<PresetRunPage> {
   }
 
   void startTimer() {
-    print(remainingActivities);
-    if (remainingActivities.length > 0) {
+    if (remainingActivities.length > currentIndex) {
       setState(() {
-        activity = remainingActivities[0];
+        activity = remainingActivities[currentIndex];
         duration = Duration(
-            hours: remainingActivities[0].hour,
-            minutes: remainingActivities[0].minute,
-            seconds: remainingActivities[0].second);
+            hours: remainingActivities[currentIndex].hour,
+            minutes: remainingActivities[currentIndex].minute,
+            seconds: remainingActivities[currentIndex].second);
       });
       timer = Timer.periodic(Duration(seconds: 1), (_) {
         setCountDown();
@@ -78,7 +78,7 @@ class _PresetRunPageState extends State<PresetRunPage> {
       final seconds = duration.inSeconds - 1;
       if (seconds < 0) {
         timer!.cancel();
-        remainingActivities = remainingActivities.sublist(1);
+        currentIndex = currentIndex + 1;
         startTimer();
       } else {
         duration = Duration(seconds: seconds);
@@ -94,11 +94,55 @@ class _PresetRunPageState extends State<PresetRunPage> {
     super.dispose();
   }
 
-  void closePage() {
+  void back() {
     Navigator.pop(context);
   }
 
-  void pause() {}
+  void pause() {
+    timer?.cancel();
+    setState(() => timer = timer);
+  }
+
+  void resume() {
+    setState(() {
+      timer = Timer.periodic(Duration(seconds: 1), (_) {
+        setCountDown();
+      });
+    });
+  }
+
+  void previous() {
+    if (currentIndex != 0) {
+      setState(() {
+        timer?.cancel();
+        currentIndex = currentIndex - 1;
+        startTimer();
+      });
+    }
+  }
+
+  void next() {
+    if (currentIndex < remainingActivities.length - 1) {
+      setState(() {
+        timer?.cancel();
+        currentIndex = currentIndex + 1;
+        startTimer();
+      });
+    }
+  }
+
+  void resetActivity() {
+    setState(() {
+      duration = Duration(
+          hours: remainingActivities[currentIndex].hour,
+          minutes: remainingActivities[currentIndex].minute,
+          seconds: remainingActivities[currentIndex].second);
+      timer?.cancel();
+      timer = Timer.periodic(Duration(seconds: 1), (_) {
+        setCountDown();
+      });
+    });
+  }
 
   void stop() {}
 
@@ -107,46 +151,128 @@ class _PresetRunPageState extends State<PresetRunPage> {
       color:
           activity == null ? Colors.transparent : Color(activity?.color ?? 0),
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      duration: const Duration(milliseconds: 1000),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 80),
+      duration: const Duration(milliseconds: 250),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            "${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 60,
-                color: getFontColorForBackground(Color(activity?.color ?? 0))),
-          )
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            GestureDetector(
+                onTap: () => back(),
+                child: Icon(Icons.arrow_back,
+                    size: 24,
+                    color: getFontColorForBackground(
+                        Color(activity?.color ?? 000)))),
+            Text(
+              activity?.name ?? '',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      getFontColorForBackground(Color(activity?.color ?? 000))),
+            ),
+            SizedBox()
+          ]),
+          Expanded(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(
+                  "${duration.inHours.toString().padLeft(2, '0')}:${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${duration.inSeconds.remainder(60).toString().padLeft(2, '0')}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 60,
+                      color: getFontColorForBackground(
+                          Color(activity?.color ?? 0))),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  currentIndex != 0
+                      ? GestureDetector(
+                          child: Icon(
+                            Icons.skip_previous,
+                            color: getFontColorForBackground(
+                                Color(activity?.color ?? 000)),
+                          ),
+                          onTap: () => previous(),
+                        )
+                      : Icon(
+                          Icons.skip_previous,
+                          color: Color(activity?.color ?? 000),
+                        ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    child: Icon(Icons.refresh,
+                        color: getFontColorForBackground(
+                            Color(activity?.color ?? 000))),
+                    onTap: () => resetActivity(),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  currentIndex < remainingActivities.length - 1
+                      ? GestureDetector(
+                          child: Icon(
+                            Icons.skip_next,
+                            color: getFontColorForBackground(
+                                Color(activity?.color ?? 000)),
+                          ),
+                          onTap: () => next(),
+                        )
+                      : Icon(
+                          Icons.skip_next,
+                          color: Color(activity?.color ?? 000),
+                        )
+                ])
+              ])
+            ],
+          ))
         ],
       ),
     );
   }
 
+  Widget renderFloatingAction() {
+    Widget playPause = FloatingActionButton(
+      heroTag: 'resume',
+      child: const Icon(Icons.play_arrow),
+      onPressed: () {
+        resume();
+      },
+    );
+    print('timer?.isActive');
+    print(timer?.isActive);
+    if (timer?.isActive != null && timer?.isActive == true) {
+      playPause = FloatingActionButton(
+        heroTag: 'pause',
+        child: const Icon(Icons.pause),
+        onPressed: () {
+          pause();
+        },
+      );
+    }
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.center, children: [playPause]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Color(activity?.color ?? 000),
-        foregroundColor:
-            getFontColorForBackground(Color(activity?.color ?? 000)),
-        title: Text(activity?.name ?? ''),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   elevation: 0,
+      //   backgroundColor: Color(activity?.color ?? 000),
+      //   foregroundColor:
+      //       getFontColorForBackground(Color(activity?.color ?? 000)),
+      //   title: Text(activity?.name ?? ''),
+      //   centerTitle: true,
+      // ),
       body: renderBody(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        FloatingActionButton(
-          heroTag: 'pause-run',
-          child: const Icon(Icons.pause),
-          onPressed: () {
-            pause();
-          },
-        )
-      ]),
+      floatingActionButton: renderFloatingAction(),
     );
   }
 }
