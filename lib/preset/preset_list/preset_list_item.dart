@@ -1,4 +1,5 @@
 import 'package:endurance/database/model/preset.dart';
+import 'package:endurance/preset/preset_view/preset_view_page.dart';
 import 'package:flutter/material.dart';
 
 class PresetListItem extends StatelessWidget {
@@ -8,7 +9,11 @@ class PresetListItem extends StatelessWidget {
 
   handleClick(context) {
     print(preset);
-    Navigator.pushNamed(context, '/preset/view', arguments: {'id': preset.id});
+    print("*");
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PresetViewPage(id: preset.id ?? 0)));
   }
 
   @override

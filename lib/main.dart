@@ -1,3 +1,5 @@
+import 'package:endurance/activity/activity_edit/activity_edit_page.dart';
+import 'package:endurance/bloc/activity_bloc.dart';
 import 'package:endurance/bloc/preset_bloc.dart';
 import 'package:endurance/preset/preset_create/preset_create_page.dart';
 import 'package:endurance/preset/preset_view/preset_view_page.dart';
@@ -17,7 +19,9 @@ class EnduranceApp extends StatelessWidget {
     return MultiBlocProvider(
         providers: [
           BlocProvider<PresetBloc>(
-              create: (BuildContext context) => PresetBloc())
+              create: (BuildContext context) => PresetBloc()),
+          BlocProvider<ActivityBloc>(
+              create: (BuildContext context) => ActivityBloc())
         ],
         child: MaterialApp(
           title: 'Endurance',
@@ -33,8 +37,7 @@ class EnduranceApp extends StatelessWidget {
           initialRoute: '/',
           routes: {
             '/': (context) => const HomePage(title: 'Home Page'),
-            '/preset/create': (context) => const CreatePresetPage(),
-            '/preset/view': (context) => const PresetViewPage()
+            '/preset/create': (context) => const CreatePresetPage()
           },
         ));
   }

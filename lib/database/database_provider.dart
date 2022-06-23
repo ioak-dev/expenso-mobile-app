@@ -1,3 +1,4 @@
+import 'package:endurance/database/model/activity.dart';
 import 'package:endurance/database/model/preset.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -36,6 +37,21 @@ class DatabaseProvider {
         ${PresetFields.name} ${textType},
         ${PresetFields.createdAt} ${textType},
         ${PresetFields.modifiedAt} ${textType}
+       )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE ${tableActivity} (
+        ${ActivityFields.id} ${idType},
+        ${ActivityFields.name} ${textType},
+        ${ActivityFields.presetId} ${integerType},
+        ${ActivityFields.hour} ${integerType},
+        ${ActivityFields.minute} ${integerType},
+        ${ActivityFields.second} ${integerType},
+        ${ActivityFields.sortOrder} ${integerType},
+        ${ActivityFields.color} ${integerType},
+        ${ActivityFields.createdAt} ${textType},
+        ${ActivityFields.modifiedAt} ${textType}
        )
     ''');
   }

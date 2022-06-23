@@ -1,20 +1,20 @@
 part of 'activity_bloc.dart';
 
 class ActivityState extends Equatable {
-  const ActivityState({this.activitys = const <Activity>[], this.isLoading = false});
+  const ActivityState({this.activities = const <Activity>[], this.isLoading = false});
 
-  final List<Activity> activitys;
+  final List<Activity> activities;
   final bool isLoading;
 
   @override
-  List<Object> get props => [activitys, isLoading];
+  List<Object> get props => [activities, isLoading];
 
   ActivityState copyWith({
-    List<Activity>? activitys,
+    List<Activity>? activities,
     bool? isLoading,
   }) {
     return ActivityState(
-        activitys: activitys ?? this.activitys,
+        activities: activities ?? this.activities,
         isLoading: isLoading ?? this.isLoading);
   }
 }

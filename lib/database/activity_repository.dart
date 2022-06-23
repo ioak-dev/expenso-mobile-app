@@ -27,7 +27,7 @@ class ActivityRepository {
 
   static Future<List<Activity>> readAllActivity() async {
     final db = await DatabaseProvider.instance.database;
-    const orderBy = '${ActivityFields.name} ASC';
+    const orderBy = '${ActivityFields.sortOrder} ASC';
     final response = await db.query(tableActivity, orderBy: orderBy);
     return response.map((map) => Activity.fromMap(map)).toList();
   }

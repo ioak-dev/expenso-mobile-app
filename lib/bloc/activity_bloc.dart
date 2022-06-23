@@ -12,15 +12,15 @@ part 'activity_state.dart';
 
 class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
   ActivityBloc() : super(const ActivityState()) {
-    on<FetchActivitys>(_mapFetchActivitysEventToState);
+    on<FetchActivities>(_mapFetchActivitiesEventToState);
   }
 
-  void _mapFetchActivitysEventToState(
-      FetchActivitys event, Emitter<ActivityState> emit) async {
-    print("fetching activitys");
+  void _mapFetchActivitiesEventToState(
+      FetchActivities event, Emitter<ActivityState> emit) async {
+    print("fetching activities");
     emit(state.copyWith(isLoading: true));
-    List<Activity> activitys = await ActivityRepository.readAllActivity();
-    print(activitys);
-    emit(state.copyWith(isLoading: false, activitys: activitys));
+    List<Activity> activities = await ActivityRepository.readAllActivity();
+    print(activities);
+    emit(state.copyWith(isLoading: false, activities: activities));
   }
 }

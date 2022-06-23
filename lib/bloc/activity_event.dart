@@ -5,4 +5,4 @@ abstract class ActivityEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchActivitys extends ActivityEvent {}
+class FetchActivities extends ActivityEvent {}

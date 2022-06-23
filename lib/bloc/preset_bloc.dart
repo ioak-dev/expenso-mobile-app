@@ -19,7 +19,6 @@ class PresetBloc extends Bloc<PresetEvent, PresetState> {
     print("fetching presets");
     emit(state.copyWith(isLoading: true));
     List<Preset> presets = await PresetRepository.readAllPreset();
-    print(presets);
     emit(state.copyWith(isLoading: false, presets: presets));
   }
 }
