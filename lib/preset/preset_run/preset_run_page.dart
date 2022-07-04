@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:wakelock/wakelock.dart';
 
 class PresetRunPage extends StatefulWidget {
   const PresetRunPage(
@@ -69,6 +70,7 @@ class _PresetRunPageState extends State<PresetRunPage> {
             minutes: remainingActivities[currentIndex].minute,
             seconds: remainingActivities[currentIndex].second);
       });
+      Wakelock.enable();
       timer = Timer.periodic(Duration(seconds: 1), (_) {
         setCountDown();
       });
@@ -91,6 +93,7 @@ class _PresetRunPageState extends State<PresetRunPage> {
   @override
   void dispose() {
     // presetBloc.close();
+    Wakelock.disable();
     timer?.cancel();
     activityBlocStream?.cancel();
     super.dispose();
@@ -101,11 +104,13 @@ class _PresetRunPageState extends State<PresetRunPage> {
   }
 
   void pause() {
+    Wakelock.disable();
     timer?.cancel();
     setState(() => timer = timer);
   }
 
   void resume() {
+    Wakelock.enable();
     setState(() {
       timer = Timer.periodic(Duration(seconds: 1), (_) {
         setCountDown();
@@ -134,6 +139,7 @@ class _PresetRunPageState extends State<PresetRunPage> {
   }
 
   void resetActivity() {
+    Wakelock.enable();
     setState(() {
       duration = Duration(
           hours: remainingActivities[currentIndex].hour,
