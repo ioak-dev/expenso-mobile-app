@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(PulseApp());
+  runApp(const PulseApp());
 }
 
 class PulseApp extends StatelessWidget {
+  const PulseApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.red),
-      home: CreateConnection(),
+      home: const CreateConnection(),
     );
   }
 }
 
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   void _openConnection(BuildContext context) {
     print("Open connection");
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => DescriptionScreen()),
+      MaterialPageRoute(builder: (context) => const DescriptionScreen()),
     );
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Connections"),
+        title: const Text("Connections"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -41,7 +45,7 @@ class HomeScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -55,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         const Text(
                           'Connection name',
                           style: TextStyle(
@@ -63,19 +67,18 @@ class HomeScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         const Text(
                           'Subtitle.',
                           style: TextStyle(
                             fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
                             onPressed: () => _openConnection(context),
-                            child: Text('Open'),
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -83,6 +86,7 @@ class HomeScreen extends StatelessWidget {
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
                             ),
+                            child: const Text('Open'),
                           ),
                         ),
                       ],
@@ -145,11 +149,13 @@ class HomeScreen extends StatelessWidget {
 }
 
 class DescriptionScreen extends StatelessWidget {
+  const DescriptionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Connection name'),
+        title: const Text('Connection name'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -163,7 +169,7 @@ class DescriptionScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 40),
+        const SizedBox(height: 40),
       Card(
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -267,6 +273,8 @@ class DescriptionScreen extends StatelessWidget {
 
 
 class CreateConnection extends StatefulWidget {
+  const CreateConnection({super.key});
+
   @override
   _CreateConnectionScreenState createState() => _CreateConnectionScreenState();
 }
@@ -286,11 +294,11 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
       print("Values: $appName, $connectionName, $apiKey");
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter all fields')),
+        const SnackBar(content: Text('Please enter all fields')),
       );
     }
   }
@@ -298,35 +306,35 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Welcome!")),
+      appBar: AppBar(title: const Text("Welcome!")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Create Connection",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
 
             TextField(
               controller: _appNameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "App name",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
 
             TextField(
               controller: _connectionNameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Connection name",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
 
             // Padding(
             //   padding: const EdgeInsets.only(bottom: 20.0),
@@ -341,23 +349,23 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
 
             TextField(
               controller: _apiKeyController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Api key",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
 
 
             Center(
               child: ElevatedButton(
                 onPressed: _handleCreateConnection,
-                child: Text("Create"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
-                  minimumSize: Size(150, 50),
+                  minimumSize: const Size(150, 50),
                 ),
+                child: const Text("Create"),
               ),
             ),
           ],
