@@ -5,7 +5,7 @@ import '../model/item.dart';
 class AddEditItemScreen extends StatefulWidget {
   final Item? item;
 
-  const AddEditItemScreen({Key? key, this.item}) : super(key: key);
+  const AddEditItemScreen({super.key, this.item});
 
   @override
   State<AddEditItemScreen> createState() => _AddEditItemScreenState();
@@ -19,9 +19,9 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.item?.title ?? '');
+    _titleController = TextEditingController(text: widget.item?.appName ?? '');
     _descriptionController =
-        TextEditingController(text: widget.item?.description ?? '');
+        TextEditingController(text: widget.item?.connectionName ?? '');
   }
 
   @override
@@ -62,8 +62,9 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
                   if (_formKey.currentState!.validate()) {
                     final item = Item(
                       id: widget.item?.id,
-                      title: _titleController.text,
-                      description: _descriptionController.text,
+                      appName: _titleController.text,
+                      connectionName: _descriptionController.text,
+                      apiKey: _descriptionController.text,
                     );
 
                     if (widget.item == null) {

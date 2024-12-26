@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../model/item.dart';
+import 'db_helper.dart';
 
 void main() {
   runApp(const PulseApp());
@@ -18,130 +20,156 @@ class PulseApp extends StatelessWidget {
 
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final String appName;
+  final String connectionName;
+
+  const HomeScreen({
+    super.key,
+    required this.appName,
+    required this.connectionName,
+  });
 
   void _openConnection(BuildContext context) {
     print("Open connection");
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const DescriptionScreen()),
+      MaterialPageRoute(
+        builder: (context) => DescriptionScreen(
+          appName: appName,
+          connectionName: connectionName,
+        ),
+      ),
     );
   }
+
+  void _handleOption1(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateConnection()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Connections"),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(
+              Icons.more_vert,
+              size: 24.0,
+              color: Colors.black,
+            ),
+            onSelected: (value) {
+              if (value == 'createConnection') {
+                _handleOption1(context);
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'createConnection',
+                child: Text('Create connection'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Connections',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 40),
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Connection name',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Subtitle.',
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () => _openConnection(context),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Open'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-
-                  const Positioned(
-                    top: -20,
-                    left: 20,
-                    child: CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.black26,
-                      child: Text(
-                        'A',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+        child: Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      connectionName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-
-
-                  Positioned(
-                    top: 10,
-                    right: 0,
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(
-                        Icons.more_vert,
-                        size: 24.0,
-                        color: Colors.black,
+                    const SizedBox(height: 8),
+                    Text(
+                      appName,
+                      style: const TextStyle(
+                        fontSize: 16,
                       ),
-                      onSelected: (value) {
-                        print('Selected: $value');
-                      },
-                      itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'Option 1',
-                          child: Text('Option 1'),
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: () => _openConnection(context),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
                         ),
-                        const PopupMenuItem<String>(
-                          value: 'Option 2',
-                          child: Text('Option 2'),
-                        ),
+                        child: const Text('Open'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-                      ],
+              const Positioned(
+                top: -20,
+                left: 20,
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.black26,
+                  child: Text(
+                    'A',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+
+              Positioned(
+                top: 10,
+                right: 0,
+                child: PopupMenuButton<String>(
+                  icon: const Icon(
+                    Icons.more_vert,
+                    size: 24.0,
+                    color: Colors.black,
+                  ),
+                  onSelected: (value) {
+                    print('Selected: $value');
+                  },
+                  itemBuilder: (BuildContext context) =>
+                  <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'Option 1',
+                      child: Text('Option 1'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'Option 2',
+                      child: Text('Option 2'),
+                    ),
+
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -149,7 +177,14 @@ class HomeScreen extends StatelessWidget {
 }
 
 class DescriptionScreen extends StatelessWidget {
-  const DescriptionScreen({super.key});
+  final String appName;
+  final String connectionName;
+
+  const DescriptionScreen({
+    super.key,
+    required this.appName,
+    required this.connectionName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -162,13 +197,13 @@ class DescriptionScreen extends StatelessWidget {
         child: Column(
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          const Text(
-          'Connection name',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        //   const Text(
+        //   'Connection name',
+        //   style: TextStyle(
+        //     fontSize: 30,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
         const SizedBox(height: 40),
       Card(
           elevation: 4,
@@ -273,7 +308,8 @@ class DescriptionScreen extends StatelessWidget {
 
 
 class CreateConnection extends StatefulWidget {
-  const CreateConnection({super.key});
+  final Item? item;
+  const CreateConnection({super.key, this.item});
 
   @override
   _CreateConnectionScreenState createState() => _CreateConnectionScreenState();
@@ -281,25 +317,45 @@ class CreateConnection extends StatefulWidget {
 
 class _CreateConnectionScreenState extends State<CreateConnection> {
 
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _appNameController = TextEditingController();
   final TextEditingController _connectionNameController = TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
 
-  void _handleCreateConnection() {
-    String appName = _appNameController.text;
-    String connectionName = _connectionNameController.text;
-    String apiKey = _apiKeyController.text;
+  void _handleCreateConnection() async {
+    try {
+      String appName = _appNameController.text;
+      String connectionName = _connectionNameController.text;
+      String apiKey = _apiKeyController.text;
 
-    if (appName.isNotEmpty && connectionName.isNotEmpty && apiKey.isNotEmpty) {
-      print("Values: $appName, $connectionName, $apiKey");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter all fields')),
-      );
+      if (_formKey.currentState!.validate()) {
+        final item = Item(
+          id: widget.item?.id,
+          appName: appName,
+          connectionName: connectionName,
+          apiKey: apiKey,
+        );
+
+        if (widget.item == null) {
+          await DBHelper.instance.insertItem(item.toMap());
+        } else {
+          await DBHelper.instance.updateItem(item.toMap(), widget.item!.id!);
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen(
+            appName: appName,
+            connectionName: connectionName,
+          ),),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter all fields')),
+        );
+      }
+    } catch (e) {
+      print("Error in _handleCreateConnection: $e");
     }
   }
 
@@ -309,6 +365,8 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
       appBar: AppBar(title: const Text("Welcome!")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -370,6 +428,7 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

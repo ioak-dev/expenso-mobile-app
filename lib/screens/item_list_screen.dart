@@ -4,7 +4,7 @@ import '../model/item.dart';
 import 'add_edit_item_screen.dart';
 
 class ItemListScreen extends StatefulWidget {
-  const ItemListScreen({Key? key}) : super(key: key);
+  const ItemListScreen({super.key});
 
   @override
   State<ItemListScreen> createState() => _ItemListScreenState();
@@ -51,8 +51,8 @@ class _ItemListScreenState extends State<ItemListScreen> {
             itemBuilder: (context, index) {
               final item = itemList[index];
               return ListTile(
-                title: Text(item.title),
-                subtitle: Text(item.description),
+                title: Text(item.appName),
+                subtitle: Text(item.connectionName),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () async {

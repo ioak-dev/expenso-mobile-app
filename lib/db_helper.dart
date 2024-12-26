@@ -31,8 +31,9 @@ class DBHelper {
     await db.execute('''
       CREATE TABLE items (
         id $idType,
-        title $textType,
-        description $textType
+        appName $textType,
+        connectionName $textType,
+        apiKey $textType
       )
     ''');
   }

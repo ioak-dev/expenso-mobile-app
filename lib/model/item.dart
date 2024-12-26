@@ -1,23 +1,26 @@
 class Item {
   final int? id;
-  final String title;
-  final String description;
+  final String appName;
+  final String connectionName;
+  final String apiKey;
 
-  Item({this.id, required this.title, required this.description});
+  Item({this.id, required this.appName, required this.connectionName, required this.apiKey });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'title': title,
-      'description': description,
+      'appName': appName,
+      'connectionName': connectionName,
+      'apiKey':apiKey
     };
   }
 
   static Item fromMap(Map<String, dynamic> map) {
     return Item(
       id: map['id'],
-      title: map['title'],
-      description: map['description'],
+      appName: map['appName'],
+      connectionName: map['connectionName'],
+      apiKey:map['apiKey'],
     );
   }
 }
