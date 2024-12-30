@@ -19,7 +19,7 @@ class PulseApp extends StatelessWidget {
 }
 
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final String appName;
   final String connectionName;
 
@@ -29,8 +29,27 @@ class HomeScreen extends StatelessWidget {
     required this.connectionName,
   });
 
-  void _openConnection(BuildContext context) {
-    print("Open connection");
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Map<String, dynamic>> items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    refreshItems();
+  }
+
+  Future<void> refreshItems() async {
+    final data = await DBHelper.instance.fetchAllItems();
+    setState(() {
+      items = data;
+    });
+  }
+
+  void _openConnection(BuildContext context, String connectionName, String appName) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -42,11 +61,16 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _handleOption1(BuildContext context) {
+  void _handleCreateConnection(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateConnection()),
-    );
+    ).then((_) => refreshItems()); // Refresh after navigating back
+  }
+
+  void _deleteConnection(int id) async {
+    await DBHelper.instance.deleteItem(id);
+    refreshItems();
   }
 
   @override
@@ -63,7 +87,7 @@ class HomeScreen extends StatelessWidget {
             ),
             onSelected: (value) {
               if (value == 'createConnection') {
-                _handleOption1(context);
+                _handleCreateConnection(context);
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -75,102 +99,110 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
+      body: items.isEmpty
+          ? const Center(child: Text('No connections found.'))
+          : ListView.separated(
         padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    Text(
-                      connectionName,
+        itemCount: items.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 25.0),
+        itemBuilder: (context, index) {
+          final item = items[index];
+          final connectionName = item['connectionName'] ?? '';
+          final appName = item['appName'] ?? '';
+
+          return Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      Text(
+                        connectionName,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        appName,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Positioned(
+                  top: -20,
+                  left: 20,
+                  child: CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.black26,
+                    child: Text(
+                      connectionName.isNotEmpty
+                          ? connectionName[0].toUpperCase()
+                          : '?',
                       style: const TextStyle(
-                        fontSize: 20,
+                        color: Colors.white,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      appName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: () => _openConnection(context),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Open'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Positioned(
-                top: -20,
-                left: 20,
-                child: CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Colors.black26,
-                  child: Text(
-                    'A',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ),
-              ),
 
-
-              Positioned(
-                top: 10,
-                right: 0,
-                child: PopupMenuButton<String>(
-                  icon: const Icon(
-                    Icons.more_vert,
-                    size: 24.0,
-                    color: Colors.black,
+                Positioned(
+                  top: 10,
+                  right: 0,
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(
+                      Icons.more_vert,
+                      size: 24.0,
+                      color: Colors.black,
+                    ),
+                    onSelected: (value) {
+                      if (value == 'delete') {
+                        print('Delete selected for $connectionName');
+                        _deleteConnection(item['id']);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Text('Delete'),
+                      ),
+                    ],
                   ),
-                  onSelected: (value) {
-                    print('Selected: $value');
-                  },
-                  itemBuilder: (BuildContext context) =>
-                  <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'Option 1',
-                      child: Text('Option 1'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'Option 2',
-                      child: Text('Option 2'),
-                    ),
-
-                  ],
                 ),
-              ),
-            ],
-          ),
-        ),
+
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: ElevatedButton(
+                    onPressed: () => _openConnection(context, connectionName, appName),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Open'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
