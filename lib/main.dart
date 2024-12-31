@@ -49,13 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _openConnection(BuildContext context, String connectionName, String appName) {
+  void _openConnection(BuildContext context, String connectionName, String appName, int connectionId) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DescriptionScreen(
           appName: appName,
           connectionName: connectionName,
+          connectionId: connectionId
         ),
       ),
     );
@@ -109,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final item = items[index];
           final connectionName = item['connectionName'] ?? '';
           final appName = item['appName'] ?? '';
+          final connectionId = item['id'] ?? '';
 
           return Card(
             elevation: 2,
@@ -188,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   bottom: 10,
                   right: 10,
                   child: ElevatedButton(
-                    onPressed: () => _openConnection(context, connectionName, appName),
+                    onPressed: () => _openConnection(context, connectionName, appName, connectionId),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -208,129 +210,142 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class DescriptionScreen extends StatelessWidget {
+class DescriptionScreen extends StatefulWidget {
   final String appName;
   final String connectionName;
+  final int connectionId;
 
   const DescriptionScreen({
     super.key,
     required this.appName,
     required this.connectionName,
+    required this.connectionId,
   });
+
+  @override
+  _DescriptionScreenState createState() => _DescriptionScreenState();
+}
+
+class _DescriptionScreenState extends State<DescriptionScreen> {
+  List<Map<String, dynamic>> items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    refreshItems();
+  }
+
+  Future<void> refreshItems() async {
+    final data = await DBHelper.instance.fetchAllItems();
+    setState(() {
+      items = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Connection name'),
+        title: Text(widget.connectionName),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-        //   const Text(
-        //   'Connection name',
-        //   style: TextStyle(
-        //     fontSize: 30,
-        //     fontWeight: FontWeight.bold,
-        //   ),
-        // ),
-        const SizedBox(height: 40),
-      Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+            const SizedBox(height: 40),
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white,
-                          child: Text(
-                            'A',
-                            style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
                           children: [
-                            Text(
-                              'Form Name',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.white,
+                              child: Text(
+                                widget.connectionName.isNotEmpty
+                                    ? widget.connectionName[0].toUpperCase()
+                                    : '?',
+                                style: const TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 15), // Space between title and subtitle
-                            Text(
-                              'Subtitle describing the form',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.connectionName,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 15), // Space between title and subtitle
+                                Text(
+                                  widget.appName,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-
-              Positioned(
-                top: 0,
-                right: 5,
-                child: PopupMenuButton<String>(
-                  icon: const Icon(
-                    Icons.more_vert,
-                    size: 20.0,
-                    color: Colors.black,
                   ),
-                  onSelected: (value) {
-                    print('Selected: $value');
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'Option 1',
-                      child: Text('Option 1'),
+                  Positioned(
+                    top: 0,
+                    right: 5,
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(
+                        Icons.more_vert,
+                        size: 20.0,
+                        color: Colors.black,
+                      ),
+                      onSelected: (value) {
+                        print('Selected: $value');
+                      },
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'Option 1',
+                          child: Text('Option 1'),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'Option 2',
+                          child: Text('Option 2'),
+                        ),
+                      ],
                     ),
-                    const PopupMenuItem<String>(
-                      value: 'Option 2',
-                      child: Text('Option 2'),
+                  ),
+                  const Positioned(
+                    bottom: 5,
+                    right: 15,
+                    child: Icon(
+                      Icons.arrow_forward,
+                      size: 28,
+                      color: Colors.grey,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              const Positioned(
-                bottom: 5,
-                right: 15,
-                child: Icon(
-                  Icons.arrow_forward,
-                  size: 28,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        ],
-        ),
-
       ),
     );
   }
