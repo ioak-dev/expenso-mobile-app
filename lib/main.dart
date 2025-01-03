@@ -20,13 +20,13 @@ class PulseApp extends StatelessWidget {
 
 
 class HomeScreen extends StatefulWidget {
-  final String appName;
-  final String connectionName;
+  late String appName;
+  late String connectionName;
 
-  const HomeScreen({
+  HomeScreen({
     super.key,
-    required this.appName,
-    required this.connectionName,
+    // required this.appName,
+    // required this.connectionName,
   });
 
   @override
@@ -35,6 +35,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> items = [];
+  var _selectedIndex=0;
 
   @override
   void initState() {
@@ -72,6 +73,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void _deleteConnection(int id) async {
     await DBHelper.instance.deleteItem(id);
     refreshItems();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if(index == 0){
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen(
+        )),
+      );
+    }
   }
 
   @override
@@ -142,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
+
                 Positioned(
                   top: -20,
                   left: 20,
@@ -206,6 +221,23 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black87,
+        elevation:10,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
@@ -228,6 +260,7 @@ class DescriptionScreen extends StatefulWidget {
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
   List<Map<String, dynamic>> items = [];
+  var _selectedIndex=0;
 
   @override
   void initState() {
@@ -240,6 +273,19 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     setState(() {
       items = data;
     });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if(index == 0){
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen(
+        )),
+      );
+    }
   }
 
   @override
@@ -347,6 +393,23 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black87,
+        elevation:10,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
@@ -365,13 +428,14 @@ class CreateConnection extends StatefulWidget {
 class _CreateConnectionScreenState extends State<CreateConnection> {
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _appNameController = TextEditingController();
   final TextEditingController _connectionNameController = TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
+  var _selectedAppName;
+  var _selectedIndex=0;
 
   void _handleCreateConnection() async {
     try {
-      String appName = _appNameController.text;
+      String appName = _selectedAppName;
       String connectionName = _connectionNameController.text;
       String apiKey = _apiKeyController.text;
 
@@ -392,10 +456,11 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen(
-            appName: appName,
-            connectionName: connectionName,
+            // appName: appName,
+            // connectionName: connectionName,
           ),),
         );
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please enter all fields')),
@@ -406,29 +471,57 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
     }
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if(index == 0){
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen(
+        )),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    length: 3;
     return Scaffold(
-      appBar: AppBar(title: const Text("Welcome!")),
+      appBar: AppBar(title: const Text("Create Connection"),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16, 25, 16, 16),
         child: Form(
           key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              "Create Connection",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 50),
-
-            TextField(
-              controller: _appNameController,
+            DropdownButtonFormField<String>(
+              value: _selectedAppName,
               decoration: const InputDecoration(
                 labelText: "App name",
                 border: OutlineInputBorder(),
               ),
+              items: const [
+                DropdownMenuItem(
+                  value: "App1",
+                  child: Text("App1"),
+                ),
+                DropdownMenuItem(
+                  value: "App2",
+                  child: Text("App2"),
+                ),
+                DropdownMenuItem(
+                  value: "App3",
+                  child: Text("App3"),
+                ),
+              ],
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedAppName = newValue!;
+                });
+              },
             ),
             const SizedBox(height: 50),
 
@@ -462,20 +555,41 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
             const SizedBox(height: 50),
 
 
-            Center(
-              child: ElevatedButton(
-                onPressed: _handleCreateConnection,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(150, 50),
-                ),
-                child: const Text("Create"),
-              ),
-            ),
+            // Center(
+            //   child: ElevatedButton(
+            //     onPressed: _handleCreateConnection,
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Colors.black,
+            //       foregroundColor: Colors.white,
+            //       minimumSize: const Size(150, 50),
+            //     ),
+            //     child: const Text("Create"),
+            //   ),
+            // ),
           ],
         ),
       ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _handleCreateConnection,
+        child: const Icon(Icons.check),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.black87,
+        elevation:10,
+        onTap: _onItemTapped,
       ),
     );
   }
