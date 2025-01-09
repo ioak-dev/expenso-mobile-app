@@ -189,6 +189,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (value == 'delete') {
                         print('Delete selected for $connectionName');
                         _deleteConnection(item['id']);
+                      } else if(value =='edit') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateConnection(
+                              item: Item(
+                                id: item['id'],
+                                appName: item['appName'],
+                                connectionName: item['connectionName'],
+                                apiKey: item['apiKey'],
+                              ),
+                            ),
+                          ),
+                        ).then((_) => refreshItems());
                       }
                     },
                     itemBuilder: (BuildContext context) =>
@@ -196,6 +210,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       const PopupMenuItem<String>(
                         value: 'delete',
                         child: Text('Delete'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Text('Edit'),
                       ),
                     ],
                   ),
@@ -432,6 +450,16 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
   final TextEditingController _apiKeyController = TextEditingController();
   var _selectedAppName;
   var _selectedIndex=0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.item != null) {
+      _selectedAppName = widget.item!.appName;
+      _connectionNameController.text = widget.item!.connectionName;
+      _apiKeyController.text = widget.item!.apiKey;
+    }
+  }
 
   void _handleCreateConnection() async {
     try {
