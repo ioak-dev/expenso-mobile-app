@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../model/item.dart';
 import 'db_helper.dart';
+import 'network_helper.dart';
 
 void main() {
   runApp(const PulseApp());
@@ -50,14 +54,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _openConnection(BuildContext context, String connectionName, String appName, int connectionId) {
+  void _openConnection(BuildContext context, String connectionName, String appName, int connectionId, String logoDark) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DescriptionScreen(
           appName: appName,
           connectionName: connectionName,
-          connectionId: connectionId
+          connectionId: connectionId,
+            logoDark:logoDark
         ),
       ),
     );
@@ -125,6 +130,10 @@ class _HomeScreenState extends State<HomeScreen> {
           final connectionName = item['connectionName'] ?? '';
           final appName = item['appName'] ?? '';
           final connectionId = item['id'] ?? '';
+          final displayName = item['displayName'] ?? '';
+          final description = item['description'] ?? '';
+          final logoDark = item['logoDark'] ?? '';
+          final logoLight = item['logoLight'] ?? '';
 
           return Card(
             elevation: 2,
@@ -152,9 +161,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         appName,
                         style: const TextStyle(fontSize: 16),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        displayName,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        description,
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ],
                   ),
                 ),
+
 
 
                 Positioned(
@@ -162,19 +182,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   left: 20,
                   child: CircleAvatar(
                     radius: 25,
-                    backgroundColor: Colors.black26,
-                    child: Text(
-                      connectionName.isNotEmpty
-                          ? connectionName[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    backgroundColor: Colors.red,
+                    child: ClipOval(
+                        child: SvgPicture.network(
+                          logoDark,
+                          width: 114,
+                          height: 114,
+                            placeholderBuilder: (context) => Container(
+                              width: 114,
+                              height: 114,
+                              color: Colors.red[50],
+                              child: const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 50,
+                              ), // Custom error icon
+                            )
+                        ),
                     ),
                   ),
                 ),
+
 
                 Positioned(
                   top: 10,
@@ -199,6 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 appName: item['appName'],
                                 connectionName: item['connectionName'],
                                 apiKey: item['apiKey'],
+                                displayName: item['displayName'],
+                                description: item['description'],
+                                logoDark: item['logoDark'],
+                                logoLight: item['logoLight'],
                               ),
                             ),
                           ),
@@ -223,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   bottom: 10,
                   right: 10,
                   child: ElevatedButton(
-                    onPressed: () => _openConnection(context, connectionName, appName, connectionId),
+                    onPressed: () => _openConnection(context, connectionName, appName, connectionId, logoDark),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -264,12 +296,14 @@ class DescriptionScreen extends StatefulWidget {
   final String appName;
   final String connectionName;
   final int connectionId;
+  final String logoDark;
 
   const DescriptionScreen({
     super.key,
     required this.appName,
     required this.connectionName,
     required this.connectionId,
+    required this.logoDark
   });
 
   @override
@@ -334,15 +368,22 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           children: [
                             CircleAvatar(
                               radius: 25,
-                              backgroundColor: Colors.white,
-                              child: Text(
-                                widget.connectionName.isNotEmpty
-                                    ? widget.connectionName[0].toUpperCase()
-                                    : '?',
-                                style: const TextStyle(
-                                  color: Colors.black45,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                              backgroundColor: Colors.red,
+                              child: ClipOval(
+                                child: SvgPicture.network(
+                                    widget.logoDark,
+                                    width: 114,
+                                    height: 114,
+                                    placeholderBuilder: (context) => Container(
+                                      width: 114,
+                                      height: 114,
+                                      color: Colors.red[50],
+                                      child: const Icon(
+                                        Icons.error_outline,
+                                        color: Colors.red,
+                                        size: 50,
+                                      ), // Custom error icon
+                                    )
                                 ),
                               ),
                             ),
@@ -437,6 +478,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
 class CreateConnection extends StatefulWidget {
   final Item? item;
+
+
   const CreateConnection({super.key, this.item});
 
   @override
@@ -450,7 +493,8 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
   final TextEditingController _apiKeyController = TextEditingController();
   var _selectedAppName;
   var _selectedIndex=0;
-
+  final NetworkHelper _networkHelper = NetworkHelper('https://api.ioak.io:8100/api/portal');
+  Map<String, dynamic> _item = {};
   @override
   void initState() {
     super.initState();
@@ -458,6 +502,44 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
       _selectedAppName = widget.item!.appName;
       _connectionNameController.text = widget.item!.connectionName;
       _apiKeyController.text = widget.item!.apiKey;
+    }
+    // fetchData();
+  }
+
+  // Future<void> fetchData() async {
+  //   print("fetching data");
+  //   var token='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjUzNjAzMjI3ODMzYTgwMDE3NWYxZWEyIiwiZ2l2ZW5fbmFtZSI6IkphbmUiLCJmYW1pbHlfbmFtZSI6IkRvZSIsIm5hbWUiOiJKYW5lIERvZSIsIm5pY2tuYW1lIjoiSmFuZSIsImVtYWlsIjoiamFuZS5kb2VAaW9hay5vcmciLCJ0eXBlIjoib25lYXV0aCIsInBlcm1pc3Npb25zIjp7IkNPTVBBTllfQURNSU4iOlsiMSIsIjIiLCIzIiwiNCIsIjUiLCI2IiwiNyJdfSwiaWF0IjoxNzM3MDI0MzQzLCJleHAiOjE3MzcwMzE1NDN9.ZrEhsNYRwff3JTfXMnYGYfkDNCKr1wM0-fl6ovkkyhWxmDLpgyPBb0X-YavIv4jRF-xWJtMClirnE4jnaQe06OxILCN2UvbjRqXpE0iNMYAtZbGNDEpCllIEgUSSnU6OIZ0jhUxL6AdpF48zVistoK7l8krfAQBl29TyDmk5xebRLCvhQfdzb6U_bnda9viO6IU86Hw8jHDeVLZLW7D58uGQ2VMkN7ArCP97T17A5c4Qm1ciWxKIMZHpliLPDNin2-rqHIjmVwOftaFmgCcoRBElIjHGz3MDntwcRMzd8pJ73euR2PYMfKCOfllnf48JREJ-16bNk5Eo1FRC6odsvqlngjevAtHdbvSTwrEw3-6rHwLL-br1nY64XPl9bxU6xN1yNhM_EVfsso-Tk7Hu8GHl8oJ0UcJppvaKATTXAEKURkn_6tycDdOWg3Eui65AgJsLTq6FskrLVgnmSyQjX-n8DR5FlcOAW8UzuTgTItPYUmCg27LB7eY-rSGmBgSmpVBn1Cr8CGaRpzhCyzQL9_VAsiIctuMNCGVKolIeoO2VsZIIdU6gLKsCXGt0X4r68CP8blS1VwWf9ehSysv0w8A3WkGxwSE1RJh-h52K0Gr_F6CoKB3JhIUBJQPxtTUL3zbyUdimBpFyyGQudyBVmzx7dkGPcGrkichICd20VAs';
+  //   var displayName='demo3';
+  //   var space=1;
+  //   try {
+  //     final response = await _networkHelper.get('/token/$space/$displayName',token);
+  //     print('response $response');
+  //     if (response.outcome) {
+  //       setState(() {
+  //         _item = response;
+  //       });
+  //     }
+  //     print("item $_item");
+  //   } catch (e) {
+  //     print('Error fetching data: $e');
+  //   }
+  // }
+
+
+  Future<Map<String, dynamic>?>  createConnectionService(String apiKey) async {
+    try {
+      final response = await _networkHelper.get('/schema', apiKey);
+      print('Response: $response');
+      return response;
+      if (response['authorization']) {
+        return response;
+      } else {
+        print('Authorization failed');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      return null;
     }
   }
 
@@ -468,27 +550,39 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
       String apiKey = _apiKeyController.text;
 
       if (_formKey.currentState!.validate()) {
-        final item = Item(
-          id: widget.item?.id,
-          appName: appName,
-          connectionName: connectionName,
-          apiKey: apiKey,
-        );
+        final response = await createConnectionService(apiKey);
+        // final Map<String, dynamic> data = json.decode(response);
+        print('second api $response');
+        if (response != null) {
 
-        if (widget.item == null) {
-          await DBHelper.instance.insertItem(item.toMap());
+          final item = Item(
+            id: widget.item?.id,
+            appName: appName,
+            connectionName: connectionName,
+            apiKey: apiKey,
+            displayName:response['displayName'],
+            description:response['description'],
+            logoDark:response['logo']['dark'],
+            logoLight:response['logo']['light']
+          );
+
+          if (widget.item == null) {
+            await DBHelper.instance.insertItem(item.toMap());
+          } else {
+            await DBHelper.instance.updateItem(item.toMap(), widget.item!.id!);
+          }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ),
+          );
         } else {
-          await DBHelper.instance.updateItem(item.toMap(), widget.item!.id!);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Authorization failed or no response')),
+          );
         }
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen(
-            // appName: appName,
-            // connectionName: connectionName,
-          ),),
-        );
-
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please enter all fields')),
@@ -496,8 +590,12 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
       }
     } catch (e) {
       print("Error in _handleCreateConnection: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred')),
+      );
     }
   }
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -543,6 +641,10 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
                 DropdownMenuItem(
                   value: "App3",
                   child: Text("App3"),
+                ),
+                DropdownMenuItem(
+                  value: "Fortuna",
+                  child: Text("Fortuna"),
                 ),
               ],
               onChanged: (String? newValue) {

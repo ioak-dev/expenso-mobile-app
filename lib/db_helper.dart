@@ -27,13 +27,18 @@ class DBHelper {
   Future _createDB(Database db, int version) async {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     const textType = 'TEXT NOT NULL';
+    const defaultText= 'TEXT DEFAULT N/A';
 
     await db.execute('''
       CREATE TABLE items (
         id $idType,
         appName $textType,
         connectionName $textType,
-        apiKey $textType
+        apiKey $textType,
+        displayName $textType,
+        description $textType,
+        logoDark $textType,
+        logoLight $textType
       )
     ''');
   }
