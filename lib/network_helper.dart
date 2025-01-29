@@ -38,7 +38,7 @@ class NetworkHelper {
         body: jsonEncode(data),
       );
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return jsonDecode(response.body); 
+        return jsonDecode(response.body);
       } else {
         throw Exception('Failed to post data: ${response.statusCode}');
       }
