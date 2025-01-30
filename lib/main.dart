@@ -22,7 +22,6 @@ class PulseApp extends StatelessWidget {
   }
 }
 
-
 class HomeScreen extends StatefulWidget {
   late String appName;
   late String connectionName;
@@ -39,7 +38,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> items = [];
-  var _selectedIndex=0;
+  var _selectedIndex = 0;
 
   @override
   void initState() {
@@ -54,16 +53,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _openConnection(BuildContext context, String connectionName, String appName, int connectionId, String logoDark) {
+  void _openConnection(BuildContext context, String connectionName,
+      String appName, int connectionId, String logoDark) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DescriptionScreen(
-          appName: appName,
-          connectionName: connectionName,
-          connectionId: connectionId,
-            logoDark:logoDark
-        ),
+            appName: appName,
+            connectionName: connectionName,
+            connectionId: connectionId,
+            logoDark: logoDark),
       ),
     );
   }
@@ -84,11 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    if(index == 0){
+    if (index == 0) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen(
-        )),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     }
   }
@@ -122,162 +120,155 @@ class _HomeScreenState extends State<HomeScreen> {
       body: items.isEmpty
           ? const Center(child: Text('No connections found.'))
           : ListView.separated(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: items.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 25.0),
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final connectionName = item['connectionName'] ?? '';
-          final appName = item['appName'] ?? '';
-          final connectionId = item['id'] ?? '';
-          final displayName = item['displayName'] ?? '';
-          final description = item['description'] ?? '';
-          final logoDark = item['logoDark'] ?? '';
-          final logoLight = item['logoLight'] ?? '';
+              padding: const EdgeInsets.all(16.0),
+              itemCount: items.length,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: 25.0),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                final connectionName = item['connectionName'] ?? '';
+                final appName = item['appName'] ?? '';
+                final connectionId = item['id'] ?? '';
+                final displayName = item['displayName'] ?? '';
+                final description = item['description'] ?? '';
+                final logoDark = item['logoDark'] ?? '';
+                final logoLight = item['logoLight'] ?? '';
 
-          return Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                return Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      const SizedBox(height: 20),
-                      Text(
-                        connectionName,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        appName,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        displayName,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        description,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-
-
-
-                Positioned(
-                  top: -20,
-                  left: 20,
-                  child: CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Colors.red,
-                    child: ClipOval(
-                        child: SvgPicture.network(
-                          logoDark,
-                          width: 114,
-                          height: 114,
-                            placeholderBuilder: (context) => Container(
-                              width: 114,
-                              height: 114,
-                              color: Colors.red[50],
-                              child: const Icon(
-                                Icons.error_outline,
-                                color: Colors.red,
-                                size: 50,
-                              ), // Custom error icon
-                            )
-                        ),
-                    ),
-                  ),
-                ),
-
-
-                Positioned(
-                  top: 10,
-                  right: 0,
-                  child: PopupMenuButton<String>(
-                    icon: const Icon(
-                      Icons.more_vert,
-                      size: 24.0,
-                      color: Colors.black,
-                    ),
-                    onSelected: (value) {
-                      if (value == 'delete') {
-                        print('Delete selected for $connectionName');
-                        _deleteConnection(item['id']);
-                      } else if(value =='edit') {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreateConnection(
-                              item: Item(
-                                id: item['id'],
-                                appName: item['appName'],
-                                connectionName: item['connectionName'],
-                                apiKey: item['apiKey'],
-                                displayName: item['displayName'],
-                                description: item['description'],
-                                logoDark: item['logoDark'],
-                                logoLight: item['logoLight'],
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            Text(
+                              connectionName,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ).then((_) => refreshItems());
-                      }
-                    },
-                    itemBuilder: (BuildContext context) =>
-                    <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Text('Delete'),
+                            const SizedBox(height: 8),
+                            Text(
+                              appName,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              displayName,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              description,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
                       ),
-                      const PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Text('Edit'),
+                      Positioned(
+                        top: -20,
+                        left: 20,
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Colors.red,
+                          child: ClipOval(
+                            child: SvgPicture.network(logoDark,
+                                width: 114,
+                                height: 114,
+                                placeholderBuilder: (context) => Container(
+                                      width: 114,
+                                      height: 114,
+                                      color: Colors.red[50],
+                                      child: const Icon(
+                                        Icons.error_outline,
+                                        color: Colors.red,
+                                        size: 50,
+                                      ), // Custom error icon
+                                    )),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 0,
+                        child: PopupMenuButton<String>(
+                          icon: const Icon(
+                            Icons.more_vert,
+                            size: 24.0,
+                            color: Colors.black,
+                          ),
+                          onSelected: (value) {
+                            if (value == 'delete') {
+                              print('Delete selected for $connectionName');
+                              _deleteConnection(item['id']);
+                            } else if (value == 'edit') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreateConnection(
+                                    item: Item(
+                                      id: item['id'],
+                                      appName: item['appName'],
+                                      connectionName: item['connectionName'],
+                                      apiKey: item['apiKey'],
+                                      displayName: item['displayName'],
+                                      description: item['description'],
+                                      logoDark: item['logoDark'],
+                                      logoLight: item['logoLight'],
+                                    ),
+                                  ),
+                                ),
+                              ).then((_) => refreshItems());
+                            }
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<String>>[
+                            const PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Text('Delete'),
+                            ),
+                            const PopupMenuItem<String>(
+                              value: 'edit',
+                              child: Text('Edit'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: ElevatedButton(
+                          onPressed: () => _openConnection(context,
+                              connectionName, appName, connectionId, logoDark),
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Open'),
+                        ),
                       ),
                     ],
                   ),
-                ),
-
-                Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: ElevatedButton(
-                    onPressed: () => _openConnection(context, connectionName, appName, connectionId, logoDark),
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Open'),
-                  ),
-                ),
-              ],
+                );
+              },
             ),
-          );
-        },
-      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
@@ -285,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.black87,
-        elevation:10,
+        elevation: 10,
         onTap: _onItemTapped,
       ),
     );
@@ -303,7 +294,7 @@ class DescriptionScreen extends StatefulWidget {
     required this.appName,
     required this.connectionName,
     required this.connectionId,
-    required this.logoDark
+    required this.logoDark,
   });
 
   @override
@@ -311,32 +302,32 @@ class DescriptionScreen extends StatefulWidget {
 }
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
-  List<Map<String, dynamic>> items = [];
-  var _selectedIndex=0;
+  List<Map<String, dynamic>> modules = [];
+  var _selectedIndex = 0;
+  final NetworkHelper _networkHelper =
+      NetworkHelper('https://api.ioak.io:8100/api/portal');
+  final TextEditingController _apiKeyController = TextEditingController();
+  String apiKey = '';
 
   @override
   void initState() {
     super.initState();
-    refreshItems();
+    apiKey = _apiKeyController.text;
+    fetchModules(apiKey);
   }
 
-  Future<void> refreshItems() async {
-    final data = await DBHelper.instance.fetchAllItems();
-    setState(() {
-      items = data;
-    });
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if(index == 0){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen(
-        )),
-      );
+  Future<void> fetchModules(String apiKey) async {
+    try {
+      final response = await _networkHelper.get('/schema/module', apiKey);
+      if (response.length > 0) {
+        setState(() {
+          modules = List<Map<String, dynamic>>.from(response);
+        });
+      } else {
+        print('Failed to fetch modules: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching modules: $e');
     }
   }
 
@@ -344,113 +335,138 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.connectionName),
+        title: const Text('Modules List'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.red,
-                              child: ClipOval(
-                                child: SvgPicture.network(
-                                    widget.logoDark,
-                                    width: 114,
-                                    height: 114,
-                                    placeholderBuilder: (context) => Container(
-                                      width: 114,
-                                      height: 114,
-                                      color: Colors.red[50],
-                                      child: const Icon(
-                                        Icons.error_outline,
-                                        color: Colors.red,
-                                        size: 50,
-                                      ), // Custom error icon
-                                    )
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Column(
+        child: modules.isEmpty
+            ? const Center(child: Text("No modules found"))
+            : ListView.builder(
+                itemCount: modules.length,
+                itemBuilder: (context, index) {
+                  final module = modules[index];
+                  final displayName =
+                      module['displayName'] ?? 'No Display Name';
+                  final description = module['description'] ?? 'No Description';
+                  final logoDark = module['icon']?['dark'] ??
+                      'https://via.placeholder.com/150';
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ModuleDetailScreen(
+                            moduleName: module['name'],
+                            apiKey: apiKey,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  widget.connectionName,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 15), // Space between title and subtitle
-                                Text(
-                                  widget.appName,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 25,
+                                      backgroundColor: Colors.red,
+                                      child: ClipOval(
+                                        child: SvgPicture.network(
+                                          logoDark,
+                                          width: 114,
+                                          height: 114,
+                                          placeholderBuilder: (context) =>
+                                              Container(
+                                            width: 114,
+                                            height: 114,
+                                            color: Colors.red[50],
+                                            child: const Icon(
+                                              Icons.error_outline,
+                                              color: Colors.red,
+                                              size: 50,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          displayName,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 15),
+                                        Text(
+                                          description,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 5,
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(
-                        Icons.more_vert,
-                        size: 20.0,
-                        color: Colors.black,
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 5,
+                            child: PopupMenuButton<String>(
+                              icon: const Icon(
+                                Icons.more_vert,
+                                size: 20.0,
+                                color: Colors.black,
+                              ),
+                              onSelected: (value) {
+                                print('Selected: $value');
+                              },
+                              itemBuilder: (BuildContext context) =>
+                                  <PopupMenuEntry<String>>[
+                                const PopupMenuItem<String>(
+                                  value: 'Option 1',
+                                  child: Text('Option 1'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'Option 2',
+                                  child: Text('Option 2'),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Positioned(
+                            bottom: 5,
+                            right: 15,
+                            child: Icon(
+                              Icons.arrow_forward,
+                              size: 28,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
-                      onSelected: (value) {
-                        print('Selected: $value');
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'Option 1',
-                          child: Text('Option 1'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'Option 2',
-                          child: Text('Option 2'),
-                        ),
-                      ],
                     ),
-                  ),
-                  const Positioned(
-                    bottom: 5,
-                    right: 15,
-                    child: Icon(
-                      Icons.arrow_forward,
-                      size: 28,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
-            ),
-          ],
-        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -458,7 +474,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
@@ -466,19 +481,14 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.black87,
-        elevation:10,
-        onTap: _onItemTapped,
+        elevation: 10,
       ),
     );
   }
 }
 
-
-
-
 class CreateConnection extends StatefulWidget {
   final Item? item;
-
 
   const CreateConnection({super.key, this.item});
 
@@ -487,13 +497,14 @@ class CreateConnection extends StatefulWidget {
 }
 
 class _CreateConnectionScreenState extends State<CreateConnection> {
-
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _connectionNameController = TextEditingController();
+  final TextEditingController _connectionNameController =
+      TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
   var _selectedAppName;
-  var _selectedIndex=0;
-  final NetworkHelper _networkHelper = NetworkHelper('https://api.ioak.io:8100/api/portal');
+  var _selectedIndex = 0;
+  final NetworkHelper _networkHelper =
+      NetworkHelper('https://api.ioak.io:8100/api/portal');
   Map<String, dynamic> _item = {};
   @override
   void initState() {
@@ -525,8 +536,7 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
   //   }
   // }
 
-
-  Future<Map<String, dynamic>?>  createConnectionService(String apiKey) async {
+  Future<Map<String, dynamic>?> createConnectionService(String apiKey) async {
     try {
       final response = await _networkHelper.get('/schema', apiKey);
       print('Response: $response');
@@ -554,17 +564,15 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
         // final Map<String, dynamic> data = json.decode(response);
         print('second api $response');
         if (response != null) {
-
           final item = Item(
-            id: widget.item?.id,
-            appName: appName,
-            connectionName: connectionName,
-            apiKey: apiKey,
-            displayName:response['displayName'],
-            description:response['description'],
-            logoDark:response['logo']['dark'],
-            logoLight:response['logo']['light']
-          );
+              id: widget.item?.id,
+              appName: appName,
+              connectionName: connectionName,
+              apiKey: apiKey,
+              displayName: response['displayName'],
+              description: response['description'],
+              logoDark: response['logo']['dark'],
+              logoLight: response['logo']['light']);
 
           if (widget.item == null) {
             await DBHelper.instance.insertItem(item.toMap());
@@ -580,7 +588,8 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Authorization failed or no response')),
+            const SnackBar(
+                content: Text('Authorization failed or no response')),
           );
         }
       } else {
@@ -596,109 +605,108 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
     }
   }
 
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    if(index == 0){
+    if (index == 0) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen(
-        )),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    length: 3;
+    length:
+    3;
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Connection"),
+      appBar: AppBar(
+        title: const Text("Create Connection"),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 25, 16, 16),
         child: Form(
           key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            DropdownButtonFormField<String>(
-              value: _selectedAppName,
-              decoration: const InputDecoration(
-                labelText: "App name",
-                border: OutlineInputBorder(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              DropdownButtonFormField<String>(
+                value: _selectedAppName,
+                decoration: const InputDecoration(
+                  labelText: "App name",
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: "App1",
+                    child: Text("App1"),
+                  ),
+                  DropdownMenuItem(
+                    value: "App2",
+                    child: Text("App2"),
+                  ),
+                  DropdownMenuItem(
+                    value: "App3",
+                    child: Text("App3"),
+                  ),
+                  DropdownMenuItem(
+                    value: "Fortuna",
+                    child: Text("Fortuna"),
+                  ),
+                ],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedAppName = newValue!;
+                  });
+                },
               ),
-              items: const [
-                DropdownMenuItem(
-                  value: "App1",
-                  child: Text("App1"),
-                ),
-                DropdownMenuItem(
-                  value: "App2",
-                  child: Text("App2"),
-                ),
-                DropdownMenuItem(
-                  value: "App3",
-                  child: Text("App3"),
-                ),
-                DropdownMenuItem(
-                  value: "Fortuna",
-                  child: Text("Fortuna"),
-                ),
-              ],
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedAppName = newValue!;
-                });
-              },
-            ),
-            const SizedBox(height: 50),
+              const SizedBox(height: 50),
 
-            TextField(
-              controller: _connectionNameController,
-              decoration: const InputDecoration(
-                labelText: "Connection name",
-                border: OutlineInputBorder(),
+              TextField(
+                controller: _connectionNameController,
+                decoration: const InputDecoration(
+                  labelText: "Connection name",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 50),
+              const SizedBox(height: 50),
 
-            // Padding(
-            //   padding: const EdgeInsets.only(bottom: 20.0),
-            //   child: TextField(
-            //     controller: _connectionNameController,
-            //     decoration: InputDecoration(
-            //       labelText: "Connection name",
-            //       border: OutlineInputBorder(),
-            //     ),
-            //   ),
-            // ),
+              // Padding(
+              //   padding: const EdgeInsets.only(bottom: 20.0),
+              //   child: TextField(
+              //     controller: _connectionNameController,
+              //     decoration: InputDecoration(
+              //       labelText: "Connection name",
+              //       border: OutlineInputBorder(),
+              //     ),
+              //   ),
+              // ),
 
-            TextField(
-              controller: _apiKeyController,
-              decoration: const InputDecoration(
-                labelText: "Api key",
-                border: OutlineInputBorder(),
+              TextField(
+                controller: _apiKeyController,
+                decoration: const InputDecoration(
+                  labelText: "Api key",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 50),
+              const SizedBox(height: 50),
 
-
-            // Center(
-            //   child: ElevatedButton(
-            //     onPressed: _handleCreateConnection,
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: Colors.black,
-            //       foregroundColor: Colors.white,
-            //       minimumSize: const Size(150, 50),
-            //     ),
-            //     child: const Text("Create"),
-            //   ),
-            // ),
-          ],
+              // Center(
+              //   child: ElevatedButton(
+              //     onPressed: _handleCreateConnection,
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.black,
+              //       foregroundColor: Colors.white,
+              //       minimumSize: const Size(150, 50),
+              //     ),
+              //     child: const Text("Create"),
+              //   ),
+              // ),
+            ],
+          ),
         ),
-      ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _handleCreateConnection,
@@ -710,7 +718,6 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
@@ -718,9 +725,123 @@ class _CreateConnectionScreenState extends State<CreateConnection> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.black87,
-        elevation:10,
+        elevation: 10,
         onTap: _onItemTapped,
       ),
     );
+  }
+}
+
+class ModuleDetailScreen extends StatefulWidget {
+  final String moduleName;
+  final String apiKey;
+
+  const ModuleDetailScreen(
+      {Key? key, required this.moduleName, required this.apiKey})
+      : super(key: key);
+
+  @override
+  _ModuleDetailScreenState createState() => _ModuleDetailScreenState();
+}
+
+class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
+  Map<String, dynamic>? moduleDetails;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchModuleDetails();
+  }
+
+  Future<void> fetchModuleDetails() async {
+    final NetworkHelper _networkHelper =
+        NetworkHelper('https://api.ioak.io:8100/api/portal');
+    try {
+      final response = await _networkHelper.get(
+          '/schema/module/${widget.moduleName}', widget.apiKey);
+      if (response != null) {
+        setState(() {
+          moduleDetails = response;
+          isLoading = false;
+        });
+      } else {
+        print('Failed to fetch module details');
+      }
+    } catch (e) {
+      print('Error fetching module details: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.moduleName),
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : moduleDetails == null
+              ? const Center(child: Text('No details found'))
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Field')),
+                      DataColumn(label: Text('Type')),
+                      DataColumn(label: Text('Actions')),
+                    ],
+                    rows: moduleDetails!['model']['fields']
+                        .entries
+                        .map<DataRow>((entry) {
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(entry.key)),
+                          DataCell(Text(entry.value)),
+                          DataCell(
+                            Row(
+                              children: moduleDetails!['action']
+                                  .map<Widget>((action) {
+                                // Loop through each action and generate icons
+                                return IconButton(
+                                  icon: Icon(_getActionIcon(action)),
+                                  onPressed: () {
+                                    _performAction(action);
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+    );
+  }
+
+  IconData _getActionIcon(dynamic type) {
+    switch (type) {
+      case 'LIST':
+        return Icons.list;
+      case 'ITEM':
+        return Icons.info;
+      case 'UPDATE':
+        return Icons.edit;
+      case 'CREATE':
+        return Icons.add;
+      case 'DELETE':
+        return Icons.delete;
+      default:
+        return Icons.error;
+    }
+  }
+
+  void _performAction(Map<String, dynamic> action) {
+    // Implement action logic here
+    print('Performing action: ${action['type']}');
   }
 }
