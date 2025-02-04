@@ -736,42 +736,73 @@ class ModuleDetailScreen extends StatefulWidget {
   final String moduleName;
   final String apiKey;
 
-  const ModuleDetailScreen(
-      {Key? key, required this.moduleName, required this.apiKey})
-      : super(key: key);
+  const ModuleDetailScreen({
+    required this.moduleName,
+    required this.apiKey,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _ModuleDetailScreenState createState() => _ModuleDetailScreenState();
 }
 
 class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
-  Map<String, dynamic>? moduleDetails;
-  bool isLoading = true;
+  late Map<String, dynamic> _schema;
+  List<dynamic> _listData = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  final NetworkHelper _networkHelper =
+      NetworkHelper('https://api.ioak.io:8100/api/portal');
 
   @override
   void initState() {
     super.initState();
-    fetchModuleDetails();
+    _loadModuleData();
   }
 
-  Future<void> fetchModuleDetails() async {
-    final NetworkHelper _networkHelper =
-        NetworkHelper('https://api.ioak.io:8100/api/portal');
+  Future<void> _loadModuleData() async {
     try {
-      final response = await _networkHelper.get(
-          '/schema/module/${widget.moduleName}', widget.apiKey);
-      if (response != null) {
+      final schemaResponse = await _networkHelper.get(
+        '/schema/module/${widget.moduleName}',
+        widget.apiKey,
+      );
+
+      if (schemaResponse == null) throw Exception('Failed to load schema');
+
+      setState(() {
+        _schema = schemaResponse;
+      });
+
+      final listAction = _schema['action']?.firstWhere(
+        (action) => action['type'] == 'LIST',
+        orElse: () => null,
+      );
+
+      if (listAction != null) {
+        final listResponse = await _networkHelper.get(
+          listAction['url'],
+          widget.apiKey,
+        );
+
+        // final listResponse = [
+        //   {
+        //     "id": "text",
+        //     "title": "text",
+        //     "description": "long_text",
+        //     "amount": "number_decimal",
+        //     "category": "options"
+        //   }
+        // ];
+
         setState(() {
-          moduleDetails = response;
-          isLoading = false;
+          _listData = List<dynamic>.from(listResponse ?? []);
+          _isLoading = false;
         });
-      } else {
-        print('Failed to fetch module details');
       }
     } catch (e) {
-      print('Error fetching module details: $e');
       setState(() {
-        isLoading = false;
+        _errorMessage = e.toString();
+        _isLoading = false;
       });
     }
   }
@@ -781,67 +812,311 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.moduleName),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _navigateToEntryForm(context, null),
+          ),
+        ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : moduleDetails == null
-              ? const Center(child: Text('No details found'))
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Field')),
-                      DataColumn(label: Text('Type')),
-                      DataColumn(label: Text('Actions')),
-                    ],
-                    rows: moduleDetails!['model']['fields']
-                        .entries
-                        .map<DataRow>((entry) {
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(entry.key)),
-                          DataCell(Text(entry.value)),
-                          DataCell(
-                            Row(
-                              children: moduleDetails!['action']
-                                  .map<Widget>((action) {
-                                // Loop through each action and generate icons
-                                return IconButton(
-                                  icon: Icon(_getActionIcon(action)),
-                                  onPressed: () {
-                                    _performAction(action);
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
+      body: _buildBody(),
     );
   }
 
-  IconData _getActionIcon(dynamic type) {
-    switch (type) {
-      case 'LIST':
-        return Icons.list;
-      case 'ITEM':
-        return Icons.info;
-      case 'UPDATE':
-        return Icons.edit;
-      case 'CREATE':
-        return Icons.add;
-      case 'DELETE':
-        return Icons.delete;
-      default:
-        return Icons.error;
+  Widget _buildBody() {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_errorMessage != null)
+      return Center(child: Text('Error: $_errorMessage'));
+    if (_listData.isEmpty) return const Center(child: Text('No records found'));
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: _buildDataColumns(),
+        rows: _buildDataRows(),
+      ),
+    );
+  }
+
+  List<DataColumn> _buildDataColumns() {
+    final fields = Map<String, dynamic>.from(_schema['model']['fields'])
+      ..remove('id'); // Remove ID column from display
+    return fields.keys.map<DataColumn>((fieldName) {
+      return DataColumn(label: Text(fieldName));
+    }).toList()
+      ..add(const DataColumn(label: Text('Actions'))); // Add Actions column
+  }
+
+  List<DataRow> _buildDataRows() {
+    return _listData.map<DataRow>((item) {
+      final fields = Map<String, dynamic>.from(_schema['model']['fields'])
+        ..remove('id');
+
+      final cells = fields.keys.map<DataCell>((fieldName) {
+        return DataCell(Text(item[fieldName]?.toString() ?? ''));
+      }).toList();
+
+      // Add Actions cell
+      cells.add(DataCell(
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
+          onSelected: (value) => _handleAction(value, item),
+          itemBuilder: (context) => [
+            const PopupMenuItem(value: 'edit', child: Text('Edit')),
+            const PopupMenuItem(value: 'delete', child: Text('Delete')),
+          ],
+        ),
+      ));
+
+      return DataRow(cells: cells);
+    }).toList();
+  }
+
+  void _handleAction(String action, dynamic item) async {
+    if (action == 'edit') {
+      _navigateToEntryForm(context, item);
+    } else if (action == 'delete') {
+      await _deleteItem(item['id']);
     }
   }
 
-  void _performAction(Map<String, dynamic> action) {
-    // Implement action logic here
-    print('Performing action: ${action['type']}');
+  Future<void> _deleteItem(String id) async {
+    try {
+      final deleteAction = _schema['action']?.firstWhere(
+        (action) => action['type'] == 'DELETE',
+        orElse: () => null,
+      );
+
+      if (deleteAction != null) {
+        final url = deleteAction['url'].replaceAll('{{id}}', id);
+        await _networkHelper.delete(url, {'apiKey': widget.apiKey});
+        _loadModuleData(); // Refresh data after deletion
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Delete failed: $e')),
+      );
+    }
+  }
+
+  void _navigateToEntryForm(BuildContext context, dynamic item) {
+    final createAction = _schema['action']?.firstWhere(
+      (action) => action['type'] == 'CREATE',
+      orElse: () => null,
+    );
+
+    if (createAction != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EntryFormScreen(
+            schema: _schema,
+            apiKey: widget.apiKey,
+            createUrl: createAction['url'],
+            editData: item,
+          ),
+        ),
+      ).then((_) => _loadModuleData());
+    }
+  }
+}
+
+class EntryFormScreen extends StatefulWidget {
+  final Map<String, dynamic> schema;
+  final String apiKey;
+  final String createUrl;
+  final dynamic editData;
+
+  const EntryFormScreen({
+    required this.schema,
+    required this.apiKey,
+    required this.createUrl,
+    this.editData,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _EntryFormScreenState createState() => _EntryFormScreenState();
+}
+
+class _EntryFormScreenState extends State<EntryFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late Map<String, dynamic> _formValues;
+  bool _isSubmitting = false;
+  final NetworkHelper _networkHelper =
+      NetworkHelper('https://api.ioak.io:8100/api/portal');
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeForm();
+  }
+
+  void _initializeForm() {
+    final fields = Map<String, dynamic>.from(widget.schema['model']['fields'])
+      ..remove('id'); // Remove ID field from form
+
+    _formValues = {};
+    fields.forEach((key, value) {
+      _formValues[key] = widget.editData?[key] ?? null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fields = Map<String, dynamic>.from(widget.schema['model']['fields'])
+      ..remove('id');
+    final options = widget.schema['model']['options'] as Map<String, dynamic>;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.editData == null ? 'New Entry' : 'Edit Entry'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              ...fields.entries.map((entry) {
+                return _buildFormField(
+                  fieldName: entry.key,
+                  fieldType: entry.value,
+                  options: options[entry.key],
+                );
+              }),
+              const SizedBox(height: 20),
+              _buildSubmitButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormField({
+    required String fieldName,
+    required String fieldType,
+    dynamic options,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            fieldName,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          _getInputField(fieldType, fieldName, options),
+        ],
+      ),
+    );
+  }
+
+  Widget _getInputField(String type, String fieldName, dynamic options) {
+    switch (type) {
+      case 'text':
+        return TextFormField(
+          initialValue: _formValues[fieldName]?.toString(),
+          decoration: InputDecoration(
+            hintText: 'Enter $fieldName',
+            border: const OutlineInputBorder(),
+          ),
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Required field' : null,
+          onSaved: (value) => _formValues[fieldName] = value,
+        );
+      case 'long_text':
+        return TextFormField(
+          initialValue: _formValues[fieldName]?.toString(),
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText: 'Enter $fieldName',
+            border: const OutlineInputBorder(),
+          ),
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Required field' : null,
+          onSaved: (value) => _formValues[fieldName] = value,
+        );
+      case 'number_decimal':
+        return TextFormField(
+          initialValue: _formValues[fieldName]?.toString(),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            hintText: 'Enter $fieldName',
+            border: const OutlineInputBorder(),
+          ),
+          validator: (value) =>
+              value?.isEmpty ?? true ? 'Required field' : null,
+          onSaved: (value) =>
+              _formValues[fieldName] = double.parse(value ?? '0'),
+        );
+      case 'options':
+        return DropdownButtonFormField(
+          value: _formValues[fieldName],
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: 'Select $fieldName',
+          ),
+          items: (options as List<dynamic>?)?.map((value) {
+            return DropdownMenuItem(
+              value: value,
+              child: Text(value.toString()),
+            );
+          }).toList(),
+          validator: (value) =>
+              value == null ? 'Please select an option' : null,
+          onChanged: (value) => _formValues[fieldName] = value,
+        );
+      default:
+        return Text('Unsupported field type: $type');
+    }
+  }
+
+  Widget _buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: _isSubmitting ? null : _submitForm,
+      child: _isSubmitting
+          ? const CircularProgressIndicator()
+          : Text(widget.editData == null ? 'Create' : 'Update'),
+    );
+  }
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSubmitting = true);
+    _formKey.currentState!.save();
+
+    try {
+      if (widget.editData == null) {
+        await _networkHelper.post(
+          widget.createUrl,
+          _formValues,
+          apiKey: widget.apiKey,
+        );
+      } else {
+        final updateAction = widget.schema['action']?.firstWhere(
+          (action) => action['type'] == 'UPDATE',
+          orElse: () => null,
+        );
+
+        if (updateAction != null) {
+          final url =
+              updateAction['url'].replaceAll('{{id}}', widget.editData['id']);
+          await _networkHelper.put(url, _formValues, widget.apiKey);
+        }
+      }
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() => _isSubmitting = false);
+    }
   }
 }
